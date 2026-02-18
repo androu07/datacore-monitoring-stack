@@ -1,0 +1,50 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+# Configuracion del sistema de alertas
+alerting:
+  alertmanagers:
+  - static_configs:
+    - targets: ['alertmanager:9093']
+
+# Configuracion de las reglas de alerta
+rule_files:
+- "alert-rules.yml"
+
+# Configuracion del monitoreo de los equipos
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Node Exporters
+  - job_name: 'headnode-exporter'
+    static_configs:
+      - targets: ['192.168.4.210:9100'] 
+
+  - job_name: 'workers-exporter'
+    static_configs:
+      - targets: 
+          - '192.168.4.211:9100' # IP Worker 1
+
+  # IPMI Exporters
+  - job_name: 'headnode-ipmi'
+    static_configs:
+      - targets: ['192.168.4.210:9290']
+
+  - job_name: 'workers-ipmi'
+    metrics_path: /ipmi
+    params:
+      module: [remote_lan]
+    static_configs:
+      - targets:
+          - 192.168.1.211  # BMC Worker 1
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: 192.168.4.210:9290
+

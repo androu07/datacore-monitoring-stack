@@ -1,0 +1,17 @@
+modules:
+  default:
+    collectors: ["bmc", "ipmi", "dcmi", "chassis"]
+    driver: "open"
+    privilege: "admin"
+    timeout: 5
+
+  remote_lan:
+    collectors: ["ipmi"]
+    driver: "lanplus"
+    user: "root"
+    pass: "exogeni2015"
+    privilege: "admin"
+    workaround_flags:
+      - "authcap"
+      - "nochecksumcheck"
+    timeout: 30
