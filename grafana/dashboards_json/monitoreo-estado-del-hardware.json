@@ -980,7 +980,9 @@
   ],
   "preload": false,
   "schemaVersion": 42,
-  "tags": [],
+  "tags": [
+    "IPMI EXPORTER"
+  ],
   "templating": {
     "list": [
       {
@@ -1014,5 +1016,5 @@
   "timezone": "browser",
   "title": "Monitoreo del Estado del Hardware del Datacore",
   "uid": "adg47pk",
-  "version": 2
+  "version": 4
 }

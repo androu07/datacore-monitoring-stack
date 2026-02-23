@@ -1185,7 +1185,9 @@
   ],
   "preload": false,
   "schemaVersion": 42,
-  "tags": [],
+  "tags": [
+    "NODE EXPORTER"
+  ],
   "templating": {
     "list": [
       {
@@ -1217,5 +1219,5 @@
   "timezone": "browser",
   "title": "Monitoreo del Uso del Hardware del Datacore",
   "uid": "adfsqdn",
-  "version": 8
+  "version": 9
 }
