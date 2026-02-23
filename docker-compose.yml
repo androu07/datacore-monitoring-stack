@@ -6,13 +6,18 @@ services:
     restart: unless-stopped
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./alert-manager/rules.yml:/etc/prometheus/rules.yml:ro
       - prometheus_data:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
       - '--storage.tsdb.retention.time=30d'
+      - '--storage.tsdb.retention.size=7GB'
+      - '--storage.tsdb.wal-compression'
     ports:
       - "9090:9090"
+    networks:
+      - monitoring_network
 
   # --- Contenedor de Grafana (Dashboards) ---
   grafana:
@@ -21,30 +26,33 @@ services:
     restart: unless-stopped
     environment:
       - GF_SECURITY_ADMIN_USER=${GRAFANA_USER:-admin}
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
     volumes:
       - grafana_data:/var/lib/grafana
-      - ./grafana/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards_json:/var/lib/grafana/dashboards
     ports:
       - "3000:3000"
     depends_on:
       - prometheus
+    networks:
+      - monitoring_network
 
   # --- Contenedor del Gestor de Alarmas ---
   alertmanager:
     image: prom/alertmanager:latest
     container_name: alertmanager
+    user: root
     ports:
       - "9093:9093"
     volumes:
-      - ./alertmanager:/etc/alertmanager
-      - alertmanager_data:/alertmanager
+      - ./alert-manager:/etc/alert-manager
+      - alertmanager_data:/alert-manager
     command:
-      - '--config.file=/etc/alertmanager/config.yml'
-      - '--storage.path=/alertmanager'
+      - '--config.file=/etc/alert-manager/config.yml'
+      - '--storage.path=/alert-manager'
     restart: unless-stopped
     networks:
-      - monitoring_net
+      - monitoring_network
 
   # --- Recolector de Metricas del Sistema Operativo ---
   node-exporter:
@@ -74,6 +82,10 @@ services:
       - 'ipmi_exporter'
       - '--config.file=/config/ipmi.yml'
       - '--web.listen-address=192.168.4.210:9290'
+
+networks:
+  monitoring_network:
+    driver: bridge
 
 volumes:
   prometheus_data:

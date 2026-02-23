@@ -2,13 +2,16 @@ global:
   smtp_smarthost: 'smtp.gmail.com:587' # Servidor SMTP de Gmail con puerto TLS (587)
   smtp_from: 'datacore.monitoring@gmail.com' # Direccion desde la cual se enviaran los correos
   smtp_auth_username: 'datacore.monitoring@gmail.com' # Usuario SMTP para autenticacion
-  smtp_auth_password: '' 
+  smtp_auth_password: 'lyza acui tngg btho'
   smtp_require_tls: true 
 
-  route:
-    receiver: 'gmail-receiver'
-  receivers:
-    - name: 'gmail-receiver'
-      email_configs:
-    - to: 'andres.lujanf@pucp.edu.pe'
-      send_resolved: true
+route:
+  receiver: 'gmail-receiver'
+  group_wait: 1m
+  group_interval: 3m
+  repeat_interval: 1h
+receivers:
+  - name: 'gmail-receiver'
+    email_configs:
+     - to: 'andres.lujanf@pucp.edu.pe'
+       send_resolved: true

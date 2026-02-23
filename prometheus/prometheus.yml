@@ -2,49 +2,65 @@ global:
   scrape_interval: 15s
   evaluation_interval: 15s
 
-# Configuracion del sistema de alertas
+# --- Conexion con Alertmanager ---
 alerting:
   alertmanagers:
   - static_configs:
     - targets: ['alertmanager:9093']
 
-# Configuracion de las reglas de alerta
+# --- Reglass de las Alertas ---
 rule_files:
-- "alert-rules.yml"
+- "rules.yml"
 
-# Configuracion del monitoreo de los equipos
+# --- Configuracion de Exportadores de los Equipos ---
 scrape_configs:
+  # Prometheus (Monitoreo propio)
   - job_name: 'prometheus'
     static_configs:
       - targets: ['localhost:9090']
 
-  # Node Exporters
-  - job_name: 'headnode-exporter'
+  # Metricas de SO (Node Exporter)
+  - job_name: 'os-metrics'
     static_configs:
+      # Headnode
       - targets: ['192.168.4.210:9100'] 
+        labels:
+           instance: 'headnode'
+      # Workers
+      #- targets: ['192.168.4.211:9100']
+      #  labels:
+      #     instance: 'worker-01'
+      - targets: ['192.168.4.212:9100']
+        labels:
+           instance: 'worker-02'
+      #- targets: ['192.168.4.213:9100']
+      #  labels:
+      #     instance: 'worker-03'
+      #- targets: ['192.168.4.214:9100']
+      #  labels:
+      #     instance: 'worker-04'
 
-  - job_name: 'workers-exporter'
+  # Metricas de Hardware (IPMI Exporter)
+  - job_name: 'hw-metrics'
+    metrics_path: /metrics
+    scrape_interval: 60s
+    scrape_timeout: 30s
     static_configs:
-      - targets: 
-          - '192.168.4.211:9100' # IP Worker 1
-
-  # IPMI Exporters
-  - job_name: 'headnode-ipmi'
-    static_configs:
+      # Headnode
       - targets: ['192.168.4.210:9290']
-
-  - job_name: 'workers-ipmi'
-    metrics_path: /ipmi
-    params:
-      module: [remote_lan]
-    static_configs:
-      - targets:
-          - 192.168.1.211  # BMC Worker 1
-    relabel_configs:
-      - source_labels: [__address__]
-        target_label: __param_target
-      - source_labels: [__param_target]
-        target_label: instance
-      - target_label: __address__
-        replacement: 192.168.4.210:9290
+        labels:
+           instance: 'headnode'
+      # Workers
+      #  - targets: ['192.168.4.211:9290']
+      #    labels:
+      #       instance: 'worker-01'
+      - targets: ['192.168.4.212:9290']
+        labels:
+           instance: 'worker-02'
+      # - targets: ['192.168.4.213:9290']
+      #   labels:
+      #      instance: 'worker-03'
+      # - targets: ['192.168.4.214:9290']
+      #   labels:
+      #      instance: 'worker-04'
 

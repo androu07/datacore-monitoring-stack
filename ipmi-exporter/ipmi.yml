@@ -1,9 +1,9 @@
 modules:
   default:
-    collectors: ["bmc", "ipmi", "dcmi", "chassis"]
+    collectors: ["bmc", "ipmi", "chassis"]
     driver: "open"
     privilege: "admin"
-    timeout: 5
+    timeout: 30
 
   remote_lan:
     collectors: ["ipmi"]
