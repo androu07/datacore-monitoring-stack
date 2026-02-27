@@ -1,0 +1,21 @@
+{{ define "custom_email.subject" }}
+[{{ .Status | toUpper }}] {{ (index .Alerts 0).Annotations.summary }}
+{{ end }}
+
+{{ define "custom_email.html" }}
+<div style="font-family: Arial, sans-serif; font-size: 14px; color: #333;">
+  <h2 style="color: {{ if eq .Status "firing" }}#d9534f{{ else }}#5cb85c{{ end }};">
+    {{ if eq .Status "firing" }} ALERTA DE SISTEMA{{ else }} SISTEMA RECUPERADO{{ end }}
+  </h2>
+  <hr style="border: 1px solid #eee;">
+  
+  {{ range .Alerts }}
+    <p><strong>Problema:</strong> {{ .Annotations.summary }}</p>
+    <p><strong>Servidor:</strong> {{ .Labels.instance }}</p>
+    <p><strong>Detalle:</strong> {{ .Annotations.description }}</p>
+    <p><strong>Nivel:</strong> {{ .Labels.severity | toUpper }}</p>
+    <br>
+    <hr style="border: 1px dashed #eee;">
+  {{ end }}
+</div>
+{{ end }}

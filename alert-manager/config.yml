@@ -5,13 +5,19 @@ global:
   smtp_auth_password: 'lyza acui tngg btho'
   smtp_require_tls: true 
 
+templates:
+  - '/etc/alert-manager/email.tmpl'
+
 route:
   receiver: 'gmail-receiver'
   group_wait: 1m
   group_interval: 3m
-  repeat_interval: 1h
+  repeat_interval: 15m
 receivers:
   - name: 'gmail-receiver'
     email_configs:
      - to: 'andres.lujanf@pucp.edu.pe'
        send_resolved: true
+       headers:
+         Subject: '{{ template "custom_email.subject" . }}'
+       html: '{{ template "custom_email.html" . }}'
