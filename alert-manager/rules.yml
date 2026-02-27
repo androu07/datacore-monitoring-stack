@@ -1,89 +1,64 @@
 groups:
-  # Grupo de alertas para el Headnode
-  - name: node_exporter_headnode_alerts
+  # Grupo de alertas para el uso de los recursos
+  - name: os_alerts
     rules:
     - alert: HighCpuUsage
-      expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{job="node_exporter_headnode", mode="idle"}[5m])) * 100) > 85
+      expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{job="os-metrics", mode="idle"}[5m])) * 100) > 85
       for: 5m
       labels:
         severity: warning
       annotations:
-        summary: "Uso de CPU alto en el headnode ({{ $labels.instance }})"
-        description: "El uso de CPU en el headnode ha superado el 85% durante 5 minutos. Valor actual: {{ $value }}%"
-    - alert: HighMemoryUsage
-      expr: (node_memory_MemTotal_bytes{job="node_exporter_headnode"} - node_memory_MemAvailable_bytes{job="node_exporter_headnode"}) / node_memory_MemTotal_bytes{job="node_exporter_headnode"} * 100 > 80
-      for: 5m
-      labels:
-        severity: warning
-      annotations:
-        summary: "Uso de Memoria alto en el headnode ({{ $labels.instance }})"
-        description: "El uso de memoria en el headnode ha superado el 80% durante 5 minutos. Valor actual: {{ $value }}%"
-    - alert: HighDiskUsage
-      expr: 100 - ((node_filesystem_avail_bytes{job="node_exporter_headnode", fstype="ext4",mountpoint="/"} / node_filesystem_size_bytes{job="node_exporter_headnode", fstype="ext4",mountpoint="/"}) * 100) > 80
-      for: 5m
-      labels:
-        severity: warning
-      annotations:
-        summary: "Uso de Disco alto en el headnode ({{ $labels.instance }})"
-        description: "El uso de disco en la particion raiz (/) del headnode ha superado el 80% durante 5 minutos. Valor actual: {{ $value }}%"
-    - alert: LowDiskSpace
-      expr: node_filesystem_avail_bytes{job="node_exporter_headnode", fstype="ext4",mountpoint="/"} / (1024 * 1024 * 1024) < 5
-      for: 5m
-      labels:
-        severity: critical
-      annotations:
-        summary: "Poco espacio en disco en el headnode ({{ $labels.instance }})"
-        description: "El espacio libre en disco en la partición raiz (/) del headnode es menor a 5GB durante 5 minutos. Valor actual: {{ $value }} GB"
-    - alert: HeadnodeDown
-      expr: up{job="node_exporter_headnode"} == 0
-      for: 1m
-      labels:
-        severity: critical
-      annotations:
-        summary: "Headnode caido"
-        description: "El headnode ha estado inactivo por mas de 1 minuto"
+        summary: "Uso de CPU alto en {{ $labels.instance }}"
+        description: "El uso de CPU en {{ $labels.instance }} ha superado el 85% por 5 minutos. Valor actual: {{ $value | humanize }}%"
 
-  # Grupo de alertas para el nodo worker1
-  - name: node_exporter_worker1_alerts
-    rules:
-    - alert: HighCpuUsage
-      expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{job="node_exporter_worker1", mode="idle"}[5m])) * 100) > 85
-      for: 5m
-      labels:
-        severity: warning
-      annotations:
-        summary: "Uso de CPU alto en Worker1 ({{ $labels.instance }})"
-        description: "El uso de CPU en el Worker1 ha superado el 85% durante 5 minutos. Valor actual: {{ $value }}%"
     - alert: HighMemoryUsage
-      expr: (node_memory_MemTotal_bytes{job="node_exporter_worker1"} - node_memory_MemAvailable_bytes{job="node_exporter_worker1"}) / node_memory_MemTotal_bytes{job="node_exporter_worker1"} * 100 > 80
+      expr: (node_memory_MemTotal_bytes{job="os-metrics"} - node_memory_MemAvailable_bytes{job="os-metrics"}) / node_memory_MemTotal_bytes{job="os-metrics"} * 100 > 80
       for: 5m
       labels:
         severity: warning
       annotations:
-        summary: "Uso de Memoria alto en Worker1 ({{ $labels.instance }})"
-        description: "El uso de memoria en el Worker1 ha superado el 80% durante 5 minutos. Valor actual: {{ $value }}%"
-    - alert: HighDiskUsage
-      expr: 100 - ((node_filesystem_avail_bytes{job="node_exporter_worker1", fstype="ext4",mountpoint="/"} / node_filesystem_size_bytes{job="node_exporter_worker1", fstype="ext4",mountpoint="/"}) * 100) > 80
-      for: 5m
-      labels:
-        severity: warning
-      annotations:
-        summary: "Uso de Disco alto en Worker1 ({{ $labels.instance }})"
-        description: "El uso de disco en la particion raiz (/) del Worker1 ha superado el 80% durante 5 minutos. Valor actual: {{ $value }}%"
+        summary: "Uso de Memoria alto en {{ $labels.instance }}"
+        description: "El uso de memoria en {{ $labels.instance }} ha superado el 80% por 5 minutos. Valor actual: {{ $value | humanize }}%"
+
     - alert: LowDiskSpace
-      expr: node_filesystem_avail_bytes{job="node_exporter_worker1", fstype="ext4",mountpoint="/"} / (1024 * 1024 * 1024) < 5
+      expr: node_filesystem_avail_bytes{job="os-metrics", fstype!~"tmpfs|squashfs|overlay", mountpoint!="/boot"} / (1024 * 1024 * 1024) < 5
       for: 5m
       labels:
         severity: critical
       annotations:
-        summary: "Poco espacio en disco en Worker1 ({{ $labels.instance }})"
-        description: "El espacio libre en disco en la particion raiz (/) del Worker1 es menor a 5GB durante 5 minutos. Valor actual: {{ $value }} GB"
-    - alert: Worker1Down
-      expr: up{job="node_exporter_worker1"} == 0
-      for: 1m
+        summary: "Poco espacio en disco en {{ $labels.instance }}"
+        description: "El disco {{ $labels.mountpoint }} en {{ $labels.instance }} tiene menos de 5GB libres. Quedan: {{ $value | humanize }} GB"
+
+  # Grupo de alertas para el estado del Hardware
+  - name: hw_alerts
+    rules:
+    - alert: HighHardwareTempWarning
+      expr: ipmi_temperature_celsius{job="hw-metrics"} > 75
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Temperatura Elevada en {{ $labels.instance }}"
+        description: "El sensor '{{ $labels.name }}' en {{ $labels.instance }} está reportando {{ $value }}°C por mas de 5 minutos."
+
+    - alert: HighHardwareTempCritical
+      expr: ipmi_temperature_celsius{job="hw-metrics"} > 85
+      for: 3m
       labels:
         severity: critical
       annotations:
-        summary: "Worker1 caido"
-        description: "El Worker1 ha estado inactivo por mas de 1 minuto"
-  
+        summary: "Temperatura CRÍTICA en {{ $labels.instance }}"
+        description: "¡URGENTE! El sensor '{{ $labels.name }}' en {{ $labels.instance }} ha alcanzado los {{ $value }}°C. Riesgo de daño por hardware."
+
+  # Alerta para saber si el nodo ha caido
+  - name: node_down_alerts
+    rules:
+    - alert: TotalNodeFailure
+      expr: (up{job="os-metrics"} == 0) and on(instance) (up{job="hw-metrics"} == 0)
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        summary: "FALLO TOTAL DEL SERVIDOR: {{ $labels.instance }}"
+        description: "El servidor {{ $labels.instance }} esta completamente inalcanzable. Posible corte de energía fisico o el nodo se ha apagado."
+
