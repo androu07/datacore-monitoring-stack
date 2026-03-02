@@ -18,7 +18,6 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 5,
   "links": [],
   "panels": [
     {
@@ -61,7 +60,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 2,
+        "h": 3,
         "w": 24,
         "x": 0,
         "y": 0
@@ -85,22 +84,23 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.3.3",
+      "pluginVersion": "12.4.0",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
+          "editorMode": "code",
           "exemplar": true,
-          "expr": "ipmi_chassis_power_state",
+          "expr": "redfish_powerstate",
           "instant": false,
           "interval": "",
           "legendFormat": "{{instance}}",
           "refId": "A"
         }
       ],
-      "title": "ESTADO DE LOS EQUIPOS",
+      "title": "ESTADO DE LOS EQUIPOS (Via Redfish)",
       "type": "stat"
     },
     {
@@ -143,10 +143,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 2,
+        "h": 3,
         "w": 24,
         "x": 0,
-        "y": 2
+        "y": 3
       },
       "id": 2,
       "options": {
@@ -166,7 +166,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.3.3",
+      "pluginVersion": "12.4.0",
       "targets": [
         {
           "datasource": {
@@ -293,7 +293,7 @@
         "h": 7,
         "w": 16,
         "x": 0,
-        "y": 4
+        "y": 6
       },
       "id": 3,
       "options": {
@@ -312,7 +312,7 @@
           "sort": "desc"
         }
       },
-      "pluginVersion": "12.3.3",
+      "pluginVersion": "12.4.0",
       "targets": [
         {
           "datasource": {
@@ -411,7 +411,7 @@
         "h": 14,
         "w": 8,
         "x": 16,
-        "y": 4
+        "y": 6
       },
       "id": 5,
       "options": {
@@ -430,7 +430,7 @@
         "sizing": "auto",
         "text": {}
       },
-      "pluginVersion": "12.3.3",
+      "pluginVersion": "12.4.0",
       "targets": [
         {
           "datasource": {
@@ -548,7 +548,7 @@
         "h": 7,
         "w": 16,
         "x": 0,
-        "y": 11
+        "y": 13
       },
       "id": 4,
       "options": {
@@ -567,7 +567,7 @@
           "sort": "desc"
         }
       },
-      "pluginVersion": "12.3.3",
+      "pluginVersion": "12.4.0",
       "targets": [
         {
           "datasource": {
@@ -687,7 +687,7 @@
         "h": 7,
         "w": 20,
         "x": 0,
-        "y": 18
+        "y": 20
       },
       "id": 6,
       "options": {
@@ -706,7 +706,7 @@
           "sort": "desc"
         }
       },
-      "pluginVersion": "12.3.3",
+      "pluginVersion": "12.4.0",
       "targets": [
         {
           "datasource": {
@@ -775,7 +775,7 @@
         "h": 7,
         "w": 4,
         "x": 20,
-        "y": 18
+        "y": 20
       },
       "id": 7,
       "options": {
@@ -793,7 +793,7 @@
         "showThresholdMarkers": true,
         "sizing": "auto"
       },
-      "pluginVersion": "12.3.3",
+      "pluginVersion": "12.4.0",
       "targets": [
         {
           "datasource": {
@@ -848,7 +848,7 @@
         "h": 10,
         "w": 20,
         "x": 0,
-        "y": 25
+        "y": 27
       },
       "id": 8,
       "options": {
@@ -867,7 +867,7 @@
         "sizing": "auto",
         "text": {}
       },
-      "pluginVersion": "12.3.3",
+      "pluginVersion": "12.4.0",
       "targets": [
         {
           "datasource": {
@@ -927,7 +927,7 @@
         "h": 10,
         "w": 4,
         "x": 20,
-        "y": 25
+        "y": 27
       },
       "id": 9,
       "options": {
@@ -947,7 +947,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.3.3",
+      "pluginVersion": "12.4.0",
       "targets": [
         {
           "datasource": {
@@ -1003,6 +1003,7 @@
         },
         "refresh": 1,
         "regex": "",
+        "regexApplyTo": "value",
         "sort": 1,
         "type": "query"
       }
@@ -1016,5 +1017,6 @@
   "timezone": "browser",
   "title": "Monitoreo del Estado del Hardware del Datacore",
   "uid": "adg47pk",
-  "version": 5
+  "version": 2,
+  "weekStart": ""
 }

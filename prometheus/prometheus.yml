@@ -27,18 +27,18 @@ scrape_configs:
         labels:
            instance: 'headnode'
       # Workers
-      #- targets: ['192.168.4.211:9100']
-      #  labels:
-      #     instance: 'worker-01'
+      - targets: ['192.168.4.211:9100']
+        labels:
+           instance: 'worker-01'
       - targets: ['192.168.4.212:9100']
         labels:
            instance: 'worker-02'
-      #- targets: ['192.168.4.213:9100']
-      #  labels:
-      #     instance: 'worker-03'
-      #- targets: ['192.168.4.214:9100']
-      #  labels:
-      #     instance: 'worker-04'
+      - targets: ['192.168.4.213:9100']
+        labels:
+           instance: 'worker-03'
+      - targets: ['192.168.4.214:9100']
+        labels:
+           instance: 'worker-04'
 
   # Metricas de Hardware (IPMI Exporter)
   - job_name: 'hw-metrics'
@@ -51,18 +51,18 @@ scrape_configs:
         labels:
            instance: 'headnode'
       # Workers
-      #  - targets: ['192.168.4.211:9290']
-      #    labels:
-      #       instance: 'worker-01'
+      - targets: ['192.168.4.211:9290']
+        labels:
+           instance: 'worker-01'
       - targets: ['192.168.4.212:9290']
         labels:
            instance: 'worker-02'
-      # - targets: ['192.168.4.213:9290']
-      #   labels:
-      #      instance: 'worker-03'
-      # - targets: ['192.168.4.214:9290']
-      #   labels:
-      #      instance: 'worker-04'
+      - targets: ['192.168.4.213:9290']
+        labels:
+           instance: 'worker-03'
+      - targets: ['192.168.4.214:9290']
+        labels:
+           instance: 'worker-04'
 
   # Estado de los nodos (Encendido - Apagado) via RedFish
   - job_name: 'node-state'
@@ -77,9 +77,18 @@ scrape_configs:
         labels:
           friendly_name: 'headnode'
       # Workers
+      - targets: ['192.168.1.211']
+        labels:
+          friendly_name: 'worker-01'
       - targets: ['192.168.1.212']
         labels:
           friendly_name: 'worker-02'
+      - targets: ['192.168.1.213']
+        labels:
+          friendly_name: 'worker-03'
+      - targets: ['192.168.1.214']
+        labels:
+          friendly_name: 'worker-04'
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
