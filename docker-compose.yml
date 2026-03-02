@@ -14,10 +14,9 @@ services:
       - '--storage.tsdb.retention.time=30d'
       - '--storage.tsdb.retention.size=7GB'
       - '--storage.tsdb.wal-compression'
+      - '--web.listen-address=192.168.4.210:9090'
     ports:
       - "9090:9090"
-    networks:
-      - monitoring_network
 
   # --- Contenedor de Grafana (Dashboards) ---
   grafana:
@@ -34,8 +33,6 @@ services:
       - "3000:3000"
     depends_on:
       - prometheus
-    networks:
-      - monitoring_network
 
   # --- Contenedor del Gestor de Alarmas ---
   alertmanager:
@@ -50,9 +47,8 @@ services:
     command:
       - '--config.file=/etc/alert-manager/config.yml'
       - '--storage.path=/alert-manager'
+      - '--web.listen-address=192.168.4.210:9093'
     restart: unless-stopped
-    networks:
-      - monitoring_network
 
   # --- Recolector de Metricas del Sistema Operativo ---
   node-exporter:
@@ -83,9 +79,13 @@ services:
       - '--config.file=/config/ipmi.yml'
       - '--web.listen-address=192.168.4.210:9290'
 
-networks:
-  monitoring_network:
-    driver: bridge
+  # Prueba
+  redfish-exporter:
+    build: ./redfish-exporter
+    container_name: redfish-exporter
+    restart: unless-stopped
+    privileged: true
+    network_mode: "host"
 
 volumes:
   prometheus_data:
