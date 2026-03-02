@@ -2,34 +2,70 @@ groups:
   # Grupo de alertas para el uso de los recursos
   - name: os_alerts
     rules:
-    - alert: HighCpuUsage
+    # --- CPU ---
+    - alert: HighCpuUsageWarning
       expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{job="os-metrics", mode="idle"}[5m])) * 100) > 85
       for: 5m
       labels:
         severity: warning
+        type: cpu
       annotations:
-        summary: "Uso de CPU alto en {{ $labels.instance }}"
+        summary: "WARNING: Uso de CPU alto en {{ $labels.instance }}"
         description: "El uso de CPU en {{ $labels.instance }} ha superado el 85% por 5 minutos. Valor actual: {{ $value | humanize }}%"
 
-    - alert: HighMemoryUsage
+    - alert: HighCpuUsageCritical
+      expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{job="os-metrics", mode="idle"}[5m])) * 100) > 95
+      for: 5m
+      labels:
+        severity: critical
+        type: cpu
+      annotations:
+        summary: "CRITICO: Uso de CPU al limite en {{ $labels.instance }}"
+        description: "El uso de CPU supero el 95%. Valor actual: {{ $value | humanize }}%"
+
+    # --- RAM ---
+    - alert: HighMemoryUsageWarning
       expr: (node_memory_MemTotal_bytes{job="os-metrics"} - node_memory_MemAvailable_bytes{job="os-metrics"}) / node_memory_MemTotal_bytes{job="os-metrics"} * 100 > 80
       for: 5m
       labels:
         severity: warning
+        type: ram
       annotations:
-        summary: "Uso de Memoria alto en {{ $labels.instance }}"
+        summary: "WARNING: Uso de Memoria alto en {{ $labels.instance }}"
         description: "El uso de memoria en {{ $labels.instance }} ha superado el 80% por 5 minutos. Valor actual: {{ $value | humanize }}%"
 
-    - alert: LowDiskSpace
+    - alert: HighMemoryUsageCritical
+      expr: (node_memory_MemTotal_bytes{job="os-metrics"} - node_memory_MemAvailable_bytes{job="os-metrics"}) / node_memory_MemTotal_bytes{job="os-metrics"} * 100 > 95
+      for: 5m
+      labels:
+        severity: critical
+        type: ram
+      annotations:
+        summary: "CRITICO: Memoria casi agotada en {{ $labels.instance }}"
+        description: "El uso de RAM supero el 95%. Valor actual: {{ $value | humanize }}%"
+
+    # --- Almacenamiento ---
+    - alert: LowDiskSpaceWarning
+      expr: node_filesystem_avail_bytes{job="os-metrics", fstype!~"tmpfs|squashfs|overlay", mountpoint!="/boot"} / (1024 * 1024 * 1024) < 15
+      for: 5m
+      labels:
+        severity: warning
+        type: disco
+      annotations:
+        summary: "WARNING: Espacio en disco bajo en {{ $labels.instance }}"
+        description: "El disco {{ $labels.mountpoint }} tiene menos de 10GB libres."
+
+    - alert: LowDiskSpaceCritical
       expr: node_filesystem_avail_bytes{job="os-metrics", fstype!~"tmpfs|squashfs|overlay", mountpoint!="/boot"} / (1024 * 1024 * 1024) < 5
       for: 5m
       labels:
         severity: critical
+        type: disco
       annotations:
-        summary: "Poco espacio en disco en {{ $labels.instance }}"
+        summary: "CRITICO: Poco espacio en disco en {{ $labels.instance }}"
         description: "El disco {{ $labels.mountpoint }} en {{ $labels.instance }} tiene menos de 5GB libres. Quedan: {{ $value | humanize }} GB"
 
-  # Grupo de alertas para el estado del Hardware
+  # Grupo de alertas para la temperatura del Hardware
   - name: hw_alerts
     rules:
     - alert: HighHardwareTempWarning
@@ -37,8 +73,9 @@ groups:
       for: 5m
       labels:
         severity: warning
+        type: temperatura
       annotations:
-        summary: "Temperatura Elevada en {{ $labels.instance }}"
+        summary: "WARNING: Temperatura Elevada en {{ $labels.instance }}"
         description: "El sensor '{{ $labels.name }}' en {{ $labels.instance }} está reportando {{ $value }}°C por mas de 5 minutos."
 
     - alert: HighHardwareTempCritical
@@ -46,19 +83,44 @@ groups:
       for: 3m
       labels:
         severity: critical
+        type: temperatura
       annotations:
-        summary: "Temperatura CRÍTICA en {{ $labels.instance }}"
-        description: "¡URGENTE! El sensor '{{ $labels.name }}' en {{ $labels.instance }} ha alcanzado los {{ $value }}°C. Riesgo de daño por hardware."
+        summary: "CRITICO: Temperatura CRITICA en {{ $labels.instance }}"
+        description: "El sensor '{{ $labels.name }}' en {{ $labels.instance }} ha alcanzado los {{ $value }}°C. Riesgo de daño por hardware."
 
-  # Alerta para saber si el nodo ha caido
-  - name: node_down_alerts
+  # Alerta para saber si el nodo o los exporters han caido
+  - name: hardware_availability
     rules:
-    - alert: TotalNodeFailure
-      expr: (up{job="os-metrics"} == 0) and on(instance) (up{job="hw-metrics"} == 0)
-      for: 2m
-      labels:
-        severity: critical
-      annotations:
-        summary: "FALLO TOTAL DEL SERVIDOR: {{ $labels.instance }}"
-        description: "El servidor {{ $labels.instance }} esta completamente inalcanzable. Posible corte de energía fisico o el nodo se ha apagado."
+      # ALERTA CRITICA: Nodo apagado fisicamente (Redfish)
+      - alert: ServidorApagado
+        expr: redfish_powerstate == 0
+        for: 10m
+        labels:
+          severity: critical
+          type: availability
+        annotations:
+          summary: "CRITICO: Nodo {{ $labels.instance }} esta APAGADO"
+          description: "El iDRAC reporta estado de energia 0 (Off) desde hace 10 minutos."
+
+      # Node exporter no responde
+      - alert: MonitoreoOS_Inaccesible
+        expr: up{job="os-metrics"} == 0 unless on(instance) redfish_powerstate == 0
+        for: 10m
+        labels:
+          severity: warning
+          type: availability
+        annotations:
+          summary: "WARNING: Exporter Node caido en {{ $labels.instance }}"
+          description: "No se reciben metricas de Node Exporter y el nodo aparece encendido. Revisar estado del contenedor!"
+      
+      # Ipmi exporter no responde
+      - alert: MonitoreoHW_Inaccesible
+        expr: ipmi_up == 0 unless on(instance) redfish_powerstate == 0
+        for: 10m
+        labels:
+          severity: warning
+          type: availability
+        annotations:
+          summary: "WARNING: Exporter IPMI caido en {{ $labels.instance }}"
+          description: "No se reciben metricas por IPMI, pero el nodo esta encendido. Revisar estado del contenedor!"
 

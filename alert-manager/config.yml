@@ -13,6 +13,7 @@ route:
   group_wait: 1m
   group_interval: 3m
   repeat_interval: 15m
+
 receivers:
   - name: 'gmail-receiver'
     email_configs:
@@ -21,3 +22,11 @@ receivers:
        headers:
          Subject: '{{ template "custom_email.subject" . }}'
        html: '{{ template "custom_email.html" . }}'
+
+inhibit_rules:
+  # Silenciar Warnings si ya hay una alerta critica del mismo tipo en el mismo nodo
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['instance', 'type']

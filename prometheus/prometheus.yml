@@ -6,11 +6,11 @@ global:
 alerting:
   alertmanagers:
   - static_configs:
-    - targets: ['alertmanager:9093']
+    - targets: ['192.168.4.210:9093']
 
 # --- Reglass de las Alertas ---
 rule_files:
-- "rules.yml"
+- "/etc/prometheus/alert-manager/rules.yml"
 
 # --- Configuracion de Exportadores de los Equipos ---
 scrape_configs:
@@ -64,3 +64,28 @@ scrape_configs:
       #   labels:
       #      instance: 'worker-04'
 
+  # Estado de los nodos (Encendido - Apagado) via RedFish
+  - job_name: 'node-state'
+    metrics_path: /health
+    scrape_interval: 2m
+    scrape_timeout: 90s
+    params:
+      job: ['redfish-metrics']
+    static_configs:
+      # Headnode
+      - targets: ['192.168.1.210']
+        labels:
+          friendly_name: 'headnode'
+      # Workers
+      - targets: ['192.168.1.212']
+        labels:
+          friendly_name: 'worker-02'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: bmc_ip
+      - source_labels: [friendly_name]
+        target_label: instance
+      - target_label: __address__
+        replacement: redfish-exporter:9220
