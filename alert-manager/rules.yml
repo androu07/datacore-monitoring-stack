@@ -111,11 +111,11 @@ groups:
           type: availability
         annotations:
           summary: "WARNING: Exporter Node caido en {{ $labels.instance }}"
-          description: "No se reciben metricas de Node Exporter y el nodo aparece encendido. Revisar estado del contenedor!"
+          description: "No se reciben metricas de Node Exporter, pero el nodo esta encendido. Revisar estado del contenedor!"
       
       # Ipmi exporter no responde
       - alert: MonitoreoHW_Inaccesible
-        expr: ipmi_up == 0 unless on(instance) redfish_powerstate == 0
+        expr: up{job="hw-metrics"} == 0 unless on(instance) redfish_powerstate == 0
         for: 10m
         labels:
           severity: warning

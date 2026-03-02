@@ -10,7 +10,7 @@ alerting:
 
 # --- Reglass de las Alertas ---
 rule_files:
-- "/etc/prometheus/alert-manager/rules.yml"
+- "/etc/prometheus/rules.yml"
 
 # --- Configuracion de Exportadores de los Equipos ---
 scrape_configs:
@@ -88,4 +88,4 @@ scrape_configs:
       - source_labels: [friendly_name]
         target_label: instance
       - target_label: __address__
-        replacement: redfish-exporter:9220
+        replacement: 192.168.4.210:9220
