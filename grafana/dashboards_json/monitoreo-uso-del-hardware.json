@@ -36,6 +36,89 @@
                 "0": {
                   "color": "red",
                   "index": 1,
+                  "text": "Apagado"
+                },
+                "1": {
+                  "color": "semi-dark-green",
+                  "index": 0,
+                  "text": "Encendido"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "colorMode": "background_solid",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {},
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "code",
+          "exemplar": true,
+          "expr": "redfish_powerstate",
+          "instant": false,
+          "interval": "",
+          "legendFormat": "{{instance}}",
+          "refId": "A"
+        }
+      ],
+      "title": "ESTADO DE LOS EQUIPOS (Via Redfish)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "color": "red",
+                  "index": 1,
                   "text": "Desconectado"
                 },
                 "1": {
@@ -63,9 +146,9 @@
         "h": 3,
         "w": 24,
         "x": 0,
-        "y": 0
+        "y": 3
       },
-      "id": 1,
+      "id": 2,
       "options": {
         "colorMode": "background",
         "graphMode": "none",
@@ -91,98 +174,15 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "max by (instance) (up{job=\"os-metrics\"})",
+          "expr": "max by (instance) (up{job=\"hw-metrics\"})",
           "format": "time_series",
           "legendFormat": "{{instance}}",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "ESTADO DE LOS NODE-EXPORTERS",
+      "title": "ESTADO DE LOS EXPORTERS-IPMI",
       "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "max": 100,
-          "min": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "light-blue",
-                "value": 0
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "percent"
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byRegexp",
-              "options": "/.*/"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "CPU Total"
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 7,
-        "w": 4,
-        "x": 0,
-        "y": 3
-      },
-      "id": 2,
-      "options": {
-        "minVizHeight": 75,
-        "minVizWidth": 75,
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true,
-        "sizing": "auto"
-      },
-      "pluginVersion": "12.4.0",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
-          "editorMode": "code",
-          "expr": "100 - (avg by (instance) (rate(node_cpu_seconds_total{mode=\"idle\", instance=~\"$instance\"}[5m])) * 100)",
-          "format": "time_series",
-          "legendFormat": "CPU",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "USO ACTUAL DE CPU",
-      "type": "gauge"
     },
     {
       "datasource": {
@@ -203,7 +203,7 @@
             "barAlignment": 0,
             "barWidthFactor": 0.6,
             "drawStyle": "line",
-            "fillOpacity": 50,
+            "fillOpacity": 90,
             "gradientMode": "opacity",
             "hideFrom": {
               "legend": false,
@@ -212,9 +212,6 @@
             },
             "insertNulls": false,
             "lineInterpolation": "smooth",
-            "lineStyle": {
-              "fill": "solid"
-            },
             "lineWidth": 2,
             "pointSize": 5,
             "scaleDistribution": {
@@ -241,23 +238,27 @@
               },
               {
                 "color": "orange",
-                "value": 75
+                "value": 65
               },
               {
                 "color": "red",
-                "value": 90
+                "value": 80
               }
             ]
           },
-          "unit": "percent"
+          "unit": "celsius"
         },
         "overrides": [
           {
             "matcher": {
-              "id": "byRegexp",
-              "options": "/.*/"
+              "id": "byName",
+              "options": "CPU ID: 24"
             },
             "properties": [
+              {
+                "id": "displayName",
+                "value": "CPU 1"
+              },
               {
                 "id": "color",
                 "value": {
@@ -266,22 +267,40 @@
                 }
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "CPU ID: 25"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "CPU 2"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
           }
         ]
       },
       "gridPos": {
-        "h": 7,
-        "w": 20,
-        "x": 4,
-        "y": 3
+        "h": 8,
+        "w": 16,
+        "x": 0,
+        "y": 6
       },
       "id": 3,
       "options": {
         "legend": {
           "calcs": [
             "lastNotNull",
-            "max",
-            "mean"
+            "max"
           ],
           "displayMode": "table",
           "placement": "bottom",
@@ -301,14 +320,14 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "100 - (avg by (instance) (rate(node_cpu_seconds_total{mode=\"idle\", instance=~\"$instance\"}[5m])) * 100)",
+          "expr": "ipmi_temperature_celsius{instance=~\"$instance\", name=\"Temp\"}",
           "format": "time_series",
-          "legendFormat": "Uso de CPU",
+          "legendFormat": "CPU ID: {{id}}",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "HISTORICO DE USO DE CPU",
+      "title": "HISTORICO DE TEMPERATURA DE LOS CPUS",
       "type": "timeseries"
     },
     {
@@ -322,8 +341,6 @@
             "mode": "thresholds"
           },
           "mappings": [],
-          "max": 100,
-          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -333,32 +350,68 @@
               },
               {
                 "color": "red",
-                "value": 85
+                "value": 70
               }
             ]
           },
-          "unit": "percent"
+          "unit": "celsius"
         },
         "overrides": [
           {
             "matcher": {
               "id": "byRegexp",
-              "options": "/.*/"
+              "options": "/.*Inlet.*/"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "RAM Usada"
+                "value": "Temp. Amb."
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/.*Exhaust.*/"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Temp. Salida"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/.*24/"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "CPU 1"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/.*25/"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "CPU 2"
               }
             ]
           }
         ]
       },
       "gridPos": {
-        "h": 7,
-        "w": 4,
-        "x": 0,
-        "y": 10
+        "h": 16,
+        "w": 8,
+        "x": 16,
+        "y": 6
       },
       "id": 5,
       "options": {
@@ -384,15 +437,14 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "editorMode": "code",
-          "expr": "(1 - (node_memory_MemAvailable_bytes{instance=~\"$instance\"} / node_memory_MemTotal_bytes{instance=~\"$instance\"})) * 100",
-          "format": "time_series",
-          "legendFormat": "RAM",
-          "range": true,
+          "exemplar": true,
+          "expr": "ipmi_temperature_celsius{instance=\"$instance\"}",
+          "interval": "",
+          "legendFormat": "{{name}} - {{id}}",
           "refId": "A"
         }
       ],
-      "title": "USO ACTUAL DE RAM",
+      "title": "TEMPERATURAS ACTUALES",
       "type": "gauge"
     },
     {
@@ -414,7 +466,7 @@
             "barAlignment": 0,
             "barWidthFactor": 0.6,
             "drawStyle": "line",
-            "fillOpacity": 15,
+            "fillOpacity": 20,
             "gradientMode": "opacity",
             "hideFrom": {
               "legend": false,
@@ -446,45 +498,24 @@
               {
                 "color": "green",
                 "value": 0
+              },
+              {
+                "color": "orange",
+                "value": 45
+              },
+              {
+                "color": "red",
+                "value": 55
               }
             ]
           },
-          "unit": "bytes"
+          "unit": "celsius"
         },
         "overrides": [
           {
             "matcher": {
-              "id": "byRegexp",
-              "options": "/.*Total.*/"
-            },
-            "properties": [
-              {
-                "id": "custom.fillOpacity",
-                "value": 0
-              },
-              {
-                "id": "custom.lineStyle",
-                "value": {
-                  "dash": [
-                    10,
-                    10
-                  ],
-                  "fill": "dash"
-                }
-              },
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "red",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byRegexp",
-              "options": "/.*Usada.*/"
+              "id": "byName",
+              "options": "Temperatura del ambiente"
             },
             "properties": [
               {
@@ -495,14 +526,29 @@
                 }
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Temperatura del aire saliente"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
           }
         ]
       },
       "gridPos": {
-        "h": 7,
-        "w": 20,
-        "x": 4,
-        "y": 10
+        "h": 8,
+        "w": 16,
+        "x": 0,
+        "y": 14
       },
       "id": 4,
       "options": {
@@ -529,9 +575,9 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "node_memory_MemTotal_bytes{instance=~\"$instance\"} - node_memory_MemAvailable_bytes{instance=~\"$instance\"}",
+          "expr": "ipmi_temperature_celsius{instance=~\"$instance\", name=\"Inlet Temp\"}",
           "format": "time_series",
-          "legendFormat": "RAM Usada",
+          "legendFormat": "Temperatura del ambiente",
           "range": true,
           "refId": "A"
         },
@@ -541,14 +587,141 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "node_memory_MemTotal_bytes{instance=~\"$instance\"}",
+          "expr": "ipmi_temperature_celsius{instance=~\"$instance\", name=\"Exhaust Temp\"}",
           "format": "time_series",
-          "legendFormat": "RAM Total",
+          "legendFormat": "Temperatura del aire saliente",
           "range": true,
           "refId": "B"
         }
       ],
-      "title": "HISTORICO DE USO DE RAM",
+      "title": "HISTORICO DE TEMPERATURAS AMBIENTALES",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "dashed"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "orange",
+                "value": 200
+              },
+              {
+                "color": "red",
+                "value": 350
+              }
+            ]
+          },
+          "unit": "watt"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/.*/"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Consumo (Watts)"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 20,
+        "x": 0,
+        "y": 22
+      },
+      "id": 6,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "code",
+          "expr": "ipmi_power_watts{instance=~\"$instance\"}",
+          "format": "time_series",
+          "legendFormat": "Consumo (Watts)",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "HISTORICO DE CONSUMO ELECTRICO",
       "type": "timeseries"
     },
     {
@@ -562,32 +735,49 @@
             "mode": "thresholds"
           },
           "mappings": [],
-          "max": 100,
+          "max": 500,
           "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "light-blue",
+                "color": "green",
                 "value": 0
               },
               {
+                "color": "orange",
+                "value": 200
+              },
+              {
                 "color": "red",
-                "value": 85
+                "value": 350
               }
             ]
           },
-          "unit": "percent"
+          "unit": "watt"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/.*/"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Energía"
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
-        "h": 8,
-        "w": 14,
-        "x": 0,
-        "y": 17
+        "h": 9,
+        "w": 4,
+        "x": 20,
+        "y": 22
       },
-      "id": 8,
+      "id": 7,
       "options": {
         "minVizHeight": 75,
         "minVizWidth": 75,
@@ -611,14 +801,14 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "100 - ((node_filesystem_avail_bytes{instance=~\"$instance\", mountpoint=~\"^(/|/home|/boot|/tmp|/var)$\"} / node_filesystem_size_bytes{instance=~\"$instance\", mountpoint=~\"^(/|/home|/boot|/tmp|/var)$\"}) * 100)",
+          "expr": "ipmi_power_watts{instance=~\"$instance\"}",
           "format": "time_series",
-          "legendFormat": "{{mountpoint}}",
+          "legendFormat": "Energía",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "USO ACTUAL DE DISCOS",
+      "title": "CONSUMO ELEC. ACTUAL",
       "type": "gauge"
     },
     {
@@ -631,79 +821,51 @@
           "color": {
             "mode": "thresholds"
           },
-          "custom": {
-            "align": "center",
-            "cellOptions": {
-              "type": "auto"
-            },
-            "footer": {
-              "reducers": []
-            },
-            "inspect": false
-          },
           "mappings": [],
+          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "red",
                 "value": 0
-              }
-            ]
-          }
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Espacio Total"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "bytes"
               },
               {
-                "id": "custom.width",
-                "value": 250
+                "color": "orange",
+                "value": 500
+              },
+              {
+                "color": "green",
+                "value": 1500
               }
             ]
           },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Espacio Usado"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "bytes"
-              },
-              {
-                "id": "custom.width",
-                "value": 250
-              },
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "light-blue",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          }
-        ]
+          "unit": "rotrpm"
+        },
+        "overrides": []
       },
       "gridPos": {
-        "h": 8,
-        "w": 10,
-        "x": 14,
-        "y": 17
+        "h": 11,
+        "w": 20,
+        "x": 0,
+        "y": 31
       },
-      "id": 7,
+      "id": 8,
       "options": {
-        "cellHeight": "lg",
-        "showHeader": true
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto",
+        "text": {}
       },
       "pluginVersion": "12.4.0",
       "targets": [
@@ -713,44 +875,14 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "sum by (mountpoint) (node_filesystem_size_bytes{instance=~\"$instance\", mountpoint=~\"^(/|/home|/boot|/tmp|/var)$\"})",
-          "format": "table",
-          "instant": true,
+          "expr": "ipmi_fan_speed_rpm{instance=~\"$instance\"}",
+          "legendFormat": "{{name}}",
+          "range": true,
           "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
-          "editorMode": "code",
-          "expr": "sum by (mountpoint) (node_filesystem_size_bytes{instance=~\"$instance\", mountpoint=~\"^(/|/home|/boot|/tmp|/var)$\"} - node_filesystem_avail_bytes{instance=~\"$instance\", mountpoint=~\"^(/|/home|/boot|/tmp|/var)$\"})",
-          "format": "table",
-          "instant": true,
-          "refId": "B"
         }
       ],
-      "title": "DETALLE EXACTO DE PARTICIONES",
-      "transformations": [
-        {
-          "id": "merge",
-          "options": {}
-        },
-        {
-          "id": "organize",
-          "options": {
-            "excludeByName": {
-              "Time": true
-            },
-            "renameByName": {
-              "Value #A": "Espacio Total",
-              "Value #B": "Espacio Usado",
-              "mountpoint": "Punto de Montaje"
-            }
-          }
-        }
-      ],
-      "type": "table"
+      "title": "VELOCIDAD DE LOS VENTILADORES",
+      "type": "gauge"
     },
     {
       "datasource": {
@@ -760,110 +892,60 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
+            "mode": "thresholds"
           },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 20,
-            "gradientMode": "opacity",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "smooth",
-            "lineWidth": 2,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "showValues": false,
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "color": "red",
+                  "index": 0,
+                  "text": "FALLO CRÍTICO"
+                },
+                "1": {
+                  "color": "green",
+                  "index": 1,
+                  "text": "OK"
+                }
+              },
+              "type": "value"
             }
-          },
-          "mappings": [],
+          ],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "red",
                 "value": 0
               }
             ]
-          },
-          "unit": "Bps"
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byRegexp",
-              "options": "/.*Descarga.*/"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "light-blue",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byRegexp",
-              "options": "/.*Subida.*/"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "orange",
-                  "mode": "fixed"
-                }
-              }
-            ]
           }
-        ]
+        },
+        "overrides": []
       },
       "gridPos": {
-        "h": 10,
-        "w": 24,
-        "x": 0,
-        "y": 25
+        "h": 11,
+        "w": 4,
+        "x": 20,
+        "y": 31
       },
       "id": 9,
       "options": {
-        "legend": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
           "calcs": [
-            "lastNotNull",
-            "max",
-            "mean"
+            "lastNotNull"
           ],
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true
+          "fields": "",
+          "values": false
         },
-        "tooltip": {
-          "hideZeros": false,
-          "mode": "multi",
-          "sort": "desc"
-        }
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
       "pluginVersion": "12.4.0",
       "targets": [
@@ -873,9 +955,9 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "rate(node_network_receive_bytes_total{instance=~\"$instance\", device=\"eno1\"}[5m])",
+          "expr": "ipmi_chassis_drive_fault_state{instance=~\"$instance\"}",
           "format": "time_series",
-          "legendFormat": "Descarga (In)",
+          "legendFormat": "Estado de Discos",
           "range": true,
           "refId": "A"
         },
@@ -885,307 +967,21 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "rate(node_network_transmit_bytes_total{instance=~\"$instance\", device=\"eno1\"}[5m])",
+          "expr": "ipmi_chassis_cooling_fault_state{instance=~\"$instance\"}",
           "format": "time_series",
-          "legendFormat": "Subida (Out)",
+          "legendFormat": "Estado de Ventilación",
           "range": true,
           "refId": "B"
         }
       ],
-      "title": "TRAFICO DE RED - eno1",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 20,
-            "gradientMode": "opacity",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "smooth",
-            "lineWidth": 2,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "showValues": false,
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": 0
-              }
-            ]
-          },
-          "unit": "Bps"
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byRegexp",
-              "options": "/.*Descarga.*/"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "light-blue",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byRegexp",
-              "options": "/.*Subida.*/"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "orange",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 10,
-        "w": 24,
-        "x": 0,
-        "y": 35
-      },
-      "id": 11,
-      "options": {
-        "legend": {
-          "calcs": [
-            "lastNotNull",
-            "max",
-            "mean"
-          ],
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "hideZeros": false,
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "pluginVersion": "12.3.3",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
-          "editorMode": "code",
-          "expr": "rate(node_network_receive_bytes_total{instance=~\"$instance\", device=\"eno3\"}[5m])",
-          "format": "time_series",
-          "legendFormat": "Descarga (In)",
-          "range": true,
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
-          "editorMode": "code",
-          "expr": "rate(node_network_transmit_bytes_total{instance=~\"$instance\", device=\"eno3\"}[5m])",
-          "format": "time_series",
-          "legendFormat": "Subida (Out)",
-          "range": true,
-          "refId": "B"
-        }
-      ],
-      "title": "TRAFICO DE RED - eno3",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 20,
-            "gradientMode": "opacity",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "smooth",
-            "lineWidth": 2,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "showValues": false,
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": 0
-              }
-            ]
-          },
-          "unit": "Bps"
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byRegexp",
-              "options": "/.*Descarga.*/"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "light-blue",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byRegexp",
-              "options": "/.*Subida.*/"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "orange",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 10,
-        "w": 24,
-        "x": 0,
-        "y": 45
-      },
-      "id": 12,
-      "options": {
-        "legend": {
-          "calcs": [
-            "lastNotNull",
-            "max",
-            "mean"
-          ],
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "hideZeros": false,
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "pluginVersion": "12.3.3",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
-          "editorMode": "code",
-          "expr": "rate(node_network_receive_bytes_total{instance=~\"$instance\", device=\"eno4\"}[5m])",
-          "format": "time_series",
-          "legendFormat": "Descarga (In)",
-          "range": true,
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
-          "editorMode": "code",
-          "expr": "rate(node_network_transmit_bytes_total{instance=~\"$instance\", device=\"eno4\"}[5m])",
-          "format": "time_series",
-          "legendFormat": "Subida (Out)",
-          "range": true,
-          "refId": "B"
-        }
-      ],
-      "title": "TRAFICO DE RED - eno4",
-      "type": "timeseries"
+      "title": "ESTADO FÍSICO DEL HARDWARE",
+      "type": "stat"
     }
   ],
   "preload": false,
   "schemaVersion": 42,
   "tags": [
-    "NODE EXPORTER"
+    "IPMI EXPORTER"
   ],
   "templating": {
     "list": [
@@ -1195,18 +991,20 @@
           "text": "headnode",
           "value": "headnode"
         },
-        "definition": "label_values(node_uname_info, instance)",
+        "definition": "label_values(ipmi_up, instance)",
+        "includeAll": false,
         "label": "Nodos",
         "name": "instance",
         "options": [],
         "query": {
           "qryType": 5,
-          "query": "label_values(node_uname_info, instance)",
+          "query": "label_values(ipmi_up, instance)",
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 1,
         "regex": "",
         "regexApplyTo": "value",
+        "sort": 1,
         "type": "query"
       }
     ]
@@ -1217,8 +1015,8 @@
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "Monitoreo del Uso del Hardware del Datacore",
-  "uid": "adfsqdn",
+  "title": "Monitoreo del Estado del Hardware del Datacore",
+  "uid": "adg47pk",
   "version": 1,
   "weekStart": ""
 }
