@@ -77,13 +77,15 @@ services:
       - '--web.listen-address=192.168.4.210:9290'
     network_mode: "host"
 
-  # Prueba
   redfish-exporter:
     build: ./redfish-exporter
     container_name: redfish-exporter
     restart: unless-stopped
     privileged: true
     network_mode: "host"
+    environment:
+      - LISTEN_ADDR=192.168.4.200
+      - LISTEN_PORT=9610
 
 volumes:
   prometheus_data:
